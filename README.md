@@ -1,8 +1,6 @@
 # EpiTunes - Web player musicale
+# Progetto realizzato dal Team 1 &nbsp; <img src="assets/img/./epicode-logo.png" alt="EPICODE" width="130">
 
-![Logo EpiTunes](./assets/img/epitunes-logo.png)
-
-**Progetto realizzato dal Team 1**
 
 Questa repository contiene il codice sorgente di **EpiTunes**, un'applicazione web ispirata a Spotify e sviluppata per **EPICODE** durante la Build Week 2. L'app usa la **iTunes Search API** per cercare brani, album e artisti e riprodurne le anteprime audio.
 
