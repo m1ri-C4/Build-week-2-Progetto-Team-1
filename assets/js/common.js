@@ -776,7 +776,7 @@ const renderSidebar = (activePage) => {
 
 const renderSidebarFavourites = () => {
     const sidebarFavs = document.querySelector("#sidebar-favs");
- console.log(getFavourites()); 
+    
     if (!sidebarFavs) return;
 
     sidebarFavs.replaceChildren();
