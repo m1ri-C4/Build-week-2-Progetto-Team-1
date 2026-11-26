@@ -273,13 +273,26 @@ class Player {
   setQueue(tracks, startIndex = 0) {
     this.trackQueue = tracks;
     this.currentIndex = startIndex;
+
+    // se Shuffle è attivo, crea un nuovo ordine casuale per la coda
+    if (this.shuffleEnabled) {
+      this.createShuffleOrder();
+    }
   }
+
+  // riproduce un brano partendo dalla sua posizione nella coda
   playFromQueue(index) {
     const track = this.trackQueue[index];
 
     if (!track) return;
 
     this.currentIndex = index;
+
+    // se Shuffle è attivo, aggiorna la posizione del brano nell'ordine casuale
+    if (this.shuffleEnabled) {
+      this.shufflePosition = this.shuffleOrder.indexOf(index);
+    }
+
     this.play(track);
   }
 
@@ -288,13 +301,45 @@ class Player {
     console.log("Coda:", this.trackQueue);
     console.log("Indice attuale:", this.currentIndex);
 
+    // se Shuffle è attivo, segue l'ordine casuale
+    if (this.shuffleEnabled) {
+      // passa alla posizione successiva nell'ordine casuale
+      if (this.shufflePosition < this.shuffleOrder.length - 1) {
+        this.shufflePosition++;
+        this.playFromQueue(this.shuffleOrder[this.shufflePosition]);
+
+        // se Repeat All è attivo, riparte dall'inizio dell'ordine casuale
+      } else if (this.repeatMode === "all" && this.shuffleOrder.length > 0) {
+        this.shufflePosition = 0;
+        this.playFromQueue(this.shuffleOrder[this.shufflePosition]);
+      }
+
+      return;
+    }
+
+    // se Shuffle è disattivato, segue l'ordine originale
     if (this.currentIndex < this.trackQueue.length - 1) {
       this.playFromQueue(this.currentIndex + 1);
+
+      // se Repeat All è attivo, riparte dal primo brano
+    } else if (this.repeatMode === "all" && this.trackQueue.length > 0) {
+      this.playFromQueue(0);
     }
   }
 
   // torna al brano precedente nella coda
   previousTrack() {
+    // se Shuffle è attivo, torna indietro nell'ordine casuale
+    if (this.shuffleEnabled) {
+      if (this.shufflePosition > 0) {
+        this.shufflePosition--;
+        this.playFromQueue(this.shuffleOrder[this.shufflePosition]);
+      }
+
+      return;
+    }
+
+    // se Shuffle è disattivato, segue l'ordine originale
     if (this.currentIndex > 0) {
       this.playFromQueue(this.currentIndex - 1);
     }
@@ -327,6 +372,26 @@ class Player {
     } else {
       this.shufflePosition = -1;
     }
+  }
+
+  // attiva e disattiva la riproduzione casuale
+  toggleShuffle() {
+    this.shuffleEnabled = !this.shuffleEnabled;
+
+    if (this.shuffleEnabled) {
+      this.createShuffleOrder();
+    } else {
+      this.shuffleOrder = [];
+      this.shufflePosition = -1;
+    }
+
+    const btnShuffle = document.querySelector("#btn-shuffle");
+
+    if (btnShuffle) {
+      btnShuffle.classList.toggle("active", this.shuffleEnabled);
+    }
+
+    console.log("Shuffle:", this.shuffleEnabled);
   }
 
   // cambia la modalità di ripetizione
@@ -372,6 +437,15 @@ class Player {
     if (btnPrev) {
       btnPrev.addEventListener("click", () => {
         this.previousTrack();
+      });
+    }
+
+    // evento = pulsante Shuffle
+    const btnShuffle = document.querySelector("#btn-shuffle");
+
+    if (btnShuffle) {
+      btnShuffle.addEventListener("click", () => {
+        this.toggleShuffle();
       });
     }
 
@@ -446,8 +520,8 @@ class Player {
 
         // Repeat All
         if (this.repeatMode === "all" && this.trackQueue.length > 0) {
-          const nextIndex = (this.currentIndex + 1) % this.trackQueue.length;
-          this.playFromQueue(nextIndex);
+          // passa al brano successivo rispettando Shuffle
+          this.nextTrack();
           return;
         }
 
