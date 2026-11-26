@@ -610,7 +610,7 @@ La navigazione è gestita attraverso la sidebar e la topbar, condivise da tutte 
 - Nella pagina di ricerca, il campo della topbar è sincronizzato con la ricerca principale.
 - La funzione `initPage()` centralizza l'inizializzazione dei componenti condivisi, della navigazione e del player musicale.
 
-### Implementazioni JavaScript
+## Implementazioni JavaScript
 
 Di seguito vengono riportate le implementazioni più significative
 del progetto, con particolare attenzione alla logica applicativa,
