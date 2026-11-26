@@ -623,6 +623,7 @@ const toggleFavourite = (track) => {
   }
 
   localStorage.setItem(STORAGE_KEY_FAVOURITES, JSON.stringify(updated));
+  renderSidebarFavourites();
 };
 
 /* ============================ 5b. Reusable components ============================ */
@@ -768,9 +769,24 @@ const renderSidebar = (activePage) => {
   sidebar.appendChild(sidebarNav);
   sidebar.appendChild(sidebarTitle);
   sidebar.appendChild(sidebarFavs);
-  // TODO (opzionale): popola #sidebar-favs con i titoli dei preferiti
+
+  renderSidebarFavourites();
 };
 
+
+const renderSidebarFavourites = () => {
+    const sidebarFavs = document.querySelector("#sidebar-favs");
+ console.log(getFavourites()); 
+    if (!sidebarFavs) return;
+
+    sidebarFavs.replaceChildren();
+
+    getFavourites().forEach((track) => {
+        const titleFavs = document.createElement("li");
+        titleFavs.textContent = track.title;
+        sidebarFavs.appendChild(titleFavs);
+    });
+};
 /* ============================ 7. Inizializzazione ============================ */
 
 /* initPage(activePage)
