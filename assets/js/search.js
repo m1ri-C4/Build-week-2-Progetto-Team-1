@@ -1,29 +1,12 @@
 /* ============================================================
    search.js — ricerca con debounce
    ============================================================
-
-   COSA DEVI FARE
-   1) initPage("search")
-   2) Recupera l'ultima query da localStorage (STORAGE_KEY_LAST_SEARCH).
-      Se presente, popola l'input e lancia la ricerca.
-   3) Aggancia l'evento "input" all'input #search-input con debounce 400ms.
-   4) doSearch(term):
-      - se term è vuoto -> nascondi i 3 row e svuota i grid
-      - altrimenti fetch in PARALLELO (Promise.all):
-          - tracks   = search?term=...&entity=song&limit=12
-          - albums   = search?term=...&entity=album&limit=8
-          - artists  = search?term=...&entity=musicArtist&limit=8
-      - mostra ciascuna sezione solo se i risultati sono > 0
-      - salva l'ultima query in localStorage
-   5) Per ogni risultato crea una card:
-      - track  -> click = player.play(track)
-      - album  -> click = window.location.href = "album.html?id=" + albumId
-      - artist -> click = window.location.href = "artist.html?id=" + artistId
 */
 
 const player = initPage("search");
 
 const input = document.querySelector("#search-input");
+const topBarInput = document.querySelector("#topbar-search");
 const error = document.querySelector("#error");
 const rowTracks = document.querySelector("#row-tracks");
 const rowAlbums = document.querySelector("#row-albums");
@@ -45,17 +28,18 @@ const renderAlbumCard = (album) => {
   cardImageWrap.classList.add("card-image-wrap");
 
   const cardImg = document.createElement("img");
+  cardImg.classList.add("w-100", "h-100", "object-fit-cover", "d-block");
   cardImg.src = bigArt(album.cover);
   cardImg.alt = album.title;
 
   cardImageWrap.appendChild(cardImg);
 
   const cardTitle = document.createElement("p");
-  cardTitle.classList.add("card-title");
+  cardTitle.classList.add("card-title", "text-truncate");
   cardTitle.textContent = album.title;
 
   const cardSub = document.createElement("p");
-  cardSub.classList.add("card-sub");
+  cardSub.classList.add("card-sub", "text-truncate");
   cardSub.textContent = album.artist;
 
   card.appendChild(cardImageWrap);
@@ -65,7 +49,7 @@ const renderAlbumCard = (album) => {
   return card;
 };
 
-const renderArtistCard = (artist) => {
+const renderArtistCard = async (artist) => {
   const card = document.createElement("div");
   card.classList.add("card");
   card.dataset.artistId = artist.id;
@@ -74,20 +58,31 @@ const renderArtistCard = (artist) => {
     window.location.href = "artist.html?id=" + artist.id;
   });
 
-  const cardImageWrap = document.createElement("div");
-  cardImageWrap.classList.add("card-image-wrap", "round");
+  const cover = document.createElement("div");
+  cover.classList.add("card-image-wrap", "round");
 
-  cardImageWrap.textContent = artist.name[0];
+  // prendo l'immagine della copertina del primo brano
+  const data = await fetchJSON(
+    `https://itunes.apple.com/lookup?id=${artist.id}&entity=song&limit=1`, // limit=1: richiedo un solo brano
+  );
+  const track = data.results[1]; // contiene il primo brano
+
+  const img = document.createElement("img");
+  img.classList.add("w-100", "h-100", "object-fit-cover", "d-block");
+  img.src = bigArt(track?.artworkUrl100);
+  img.alt = artist.name;
+
+  cover.appendChild(img);
 
   const cardTitle = document.createElement("p");
   cardTitle.classList.add("card-title");
   cardTitle.textContent = artist.name;
 
   const cardSub = document.createElement("p");
-  cardSub.classList.add("card-sub");
+  cardSub.classList.add("card-sub", "text-truncate");
   cardSub.textContent = artist.genre;
 
-  card.appendChild(cardImageWrap);
+  card.appendChild(cover);
   card.appendChild(cardTitle);
   card.appendChild(cardSub);
 
@@ -142,9 +137,23 @@ const doSearch = async (term) => {
     rowAlbums.hidden = albums.results.length === 0 ? true : false;
     rowArtists.hidden = artists.results.length === 0 ? true : false;
 
-    gridTracks.replaceChildren(...trackList.map(createTrackCard)); // genera una card per ogni risultato con map(), con lo spread operetor prendo singolarmente le card e sostituisco le precedenti con le nuove con replace children
-    gridAlbums.replaceChildren(...albumList.map(renderAlbumCard));
-    gridArtists.replaceChildren(...artistList.map(renderArtistCard));
+    // genero una card per ogni brano trovato con map()
+    // track = singolo brano, index = posizione del brano nella lista
+    gridTracks.replaceChildren(
+      ...trackList.map(
+        (
+          track,
+          index, //scorre tutti i brani trovati e crea una card per ciascuno (recupera il brano corrente e la sua posizione)
+        ) =>
+          // creo la card passando anche tutta la lista e l'indice
+          // così il player può gestire la coda dei brani della ricerca
+          createTrackCard(track, trackList, index), //rea la card e passa al player le informazioni necessarie per la coda.
+      ),
+    );
+    gridAlbums.replaceChildren(...albumList.map(renderAlbumCard)); //distribuisce le card create come singoli elementi. ostituisce le card della ricerca precedente con quelle nuove.
+
+    const artistCards = await Promise.all(artistList.map(renderArtistCard)); //uso promise.all perchè il render è una funzione asincrona e map() restituisce un array di promise
+    gridArtists.replaceChildren(...artistCards);
 
     localStorage.setItem(STORAGE_KEY_LAST_SEARCH, term); //salvo ultima ricerca
   } catch (error) {
@@ -155,6 +164,11 @@ const doSearch = async (term) => {
 const debouncedSearch = debounce(doSearch, 400);
 
 input.addEventListener("input", (event) => {
+  debouncedSearch(event.target.value.trim());
+});
+
+topBarInput.addEventListener("input", (event) => {
+  input.value = event.target.value;
   debouncedSearch(event.target.value.trim());
 });
 

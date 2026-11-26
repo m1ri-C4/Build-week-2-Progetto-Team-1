@@ -1,12 +1,5 @@
-/* ============================================================
-   EpiTunes — CSS base
-   Layout 3 zone (sidebar / main / player) responsive con Grid.
-   Palette scura ispirata a Spotify, accenti gialli brand Epicode.
-   Lo studente NON deve modificare questo file salvo voglia
-   personalizzare l'aspetto. Tutto il lavoro è in HTML e JS.
-   ============================================================ */
-
 :root {
+  /* palette */
   --bg-base: #121212;
   --bg-elev: #181818;
   --bg-elev-hover: #282828;
@@ -16,47 +9,58 @@
   --text-primary: #ffffff;
   --text-secondary: #b3b3b3;
   --text-input: #000000;
-  --accent: #f7d800;        /* giallo Epicode */
+  --accent: #f7d800;
+  /* giallo Epicode */
   --accent-dark: #d6ba00;
-  --success: #1ed760;       /* verde "play" */
+  --success: #1ed760;
+  /* verde "play" */
   --danger: #e25555;
   --border: #2a2a2a;
+  --track-bar: #4d4d4d;
+  --overlay: rgba(0, 0, 0, 0.6);
+
+  /* raggi e ombre */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-}
 
-* {
-  box-sizing: border-box;
+  /* animazioni */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 0.15s;
+  --t-base: 0.2s;
+  --t-slow: 0.45s;
+
+  /* classi bootstrap */
+  --bs-body-bg: var(--bg-base);
+  --bs-body-color: var(--text-primary);
+  --bs-body-font-size: 14px;
+  --bs-body-line-height: normal;
+  --bs-body-font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --bs-secondary-color: var(--text-secondary);
+  --bs-border-color: var(--border);
+  --bs-border-radius: var(--radius-sm);
+  --bs-border-radius-pill: 999px;
 }
 
 html,
 body {
   height: 100%;
-  margin: 0;
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
   overflow: hidden;
 }
 
-a {
+a,
+a:hover {
   color: inherit;
   text-decoration: none;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-
-#error{
+#error {
   color: red;
 }
 
-/* ============================ Layout 3 zone ============================ */
+/* layout con css grid */
 
 .app {
   display: grid;
@@ -67,6 +71,8 @@ button {
     "player  player";
   height: 100vh;
 }
+
+
 
 .sidebar {
   grid-area: sidebar;
@@ -87,53 +93,90 @@ button {
   background: var(--bg-player);
   border-top: 1px solid var(--border);
   padding: 12px 16px;
-}
-
-/* ============================ Sidebar ============================ */
-
-.brand {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px 24px 8px;
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.5px;
+  gap: 16px;
 }
+
+/* animazioni */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes heart-animation {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* transizione avvio pagina */
+.main > section {
+  animation: fade-in var(--t-slow) var(--ease) both;
+}
+
+.sidebar {
+  animation: fade-in var(--t-slow) var(--ease) both;
+  
+}
+
+/* sidebar */
+
 .brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #000;
+  width: 40px;
+  height: 40px;
+  color: black;
   display: grid;
   place-items: center;
   font-weight: 900;
+    transition:
+    transform var(--t-fast) var(--ease),
+    background var(--t-fast);
 }
 
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 24px;
+.brand:hover .brand-mark {
+  transform: scale(1.1);
 }
+
 .sidebar-nav a {
-  display: flex;
-  align-items: center;
   gap: 14px;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-weight: 600;
+  transition:
+    color var(--t-base),
+    background var(--t-base),
+    transform var(--t-base) var(--ease);
 }
+
 .sidebar-nav a:hover {
   color: var(--text-primary);
   background: var(--bg-elev-hover);
+  transform: translateX(3px);
 }
+
 .sidebar-nav a.active {
   color: var(--text-primary);
   background: var(--bg-elev);
 }
+
 .sidebar-nav a .ico {
   font-size: 18px;
   width: 22px;
@@ -145,33 +188,44 @@ button {
   font-size: 11px;
   letter-spacing: 1px;
   color: var(--text-secondary);
-  padding: 16px 12px 8px 12px;
+  padding: 16px 12px 8px;
   margin: 0;
 }
 
+/* lista sidebar dei preferiti*/
 .sidebar-list {
-  display: flex;
-  flex-direction: column;
   gap: 2px;
   padding: 0 4px;
-  list-style: none;
-  margin: 0;
 }
+
 .sidebar-list li {
+  list-style: none;
   padding: 6px 8px;
   font-size: 13px;
   color: var(--text-secondary);
   border-radius: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  transition:
+    color var(--t-fast),
+    background var(--t-fast);
 }
+
 .sidebar-list li:hover {
   color: var(--text-primary);
   background: var(--bg-elev);
 }
 
-/* ============================ Topbar ============================ */
+.sidebar-empty {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 6px 8px;
+}
+
+/* top bar */
+
+.topbar-search {
+  display: none;
+}
 
 .topbar {
   position: sticky;
@@ -179,47 +233,83 @@ button {
   z-index: 5;
   background: rgba(18, 18, 18, 0.7);
   backdrop-filter: blur(20px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
+  padding: 14px 0 14px 0;
 }
-.topbar-nav {
-  display: flex;
-  gap: 8px;
-}
+
 .nav-btn {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  border-radius: 50%;
+  background: var(--overlay);
+  color: white;
   font-size: 18px;
   line-height: 1;
-}
-.user-pill {
-  background: rgba(0, 0, 0, 0.6);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 13px;
+  transition:
+    background var(--t-base),
+    transform var(--t-fast) var(--ease);
 }
 
-/* ============================ Sezioni / Rows ============================ */
+.nav-btn:hover {
+  background: var(--bg-elev-hover);
+  transform: scale(1.1);
+}
+
+.nav-btn:active {
+  transform: scale(0.94);
+}
+
+.user-pill {
+  background: var(--overlay);
+  padding: 6px 12px;
+  font-size: 13px;
+  transition: background var(--t-base);
+}
+
+.user-pill:hover {
+  background: var(--bg-elev-hover);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.352);
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    transform var(--t-fast) var(--ease),
+    background var(--t-fast);
+}
+
+.avatar:hover {
+  transform: scale(1.18);
+}
+
+.avatar:active {
+  transform: scale(0.92);
+}
+
+/* varie sezioni */
 
 .home,
 .search,
 .album-page,
 .artist-page {
-  padding: 16px 24px 32px 24px;
+  padding: 16px 24px 32px;
 }
 
 .row {
   margin-top: 24px;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+  display: block;
+  scroll-margin-top: 300px;
 }
+
 .row h2 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 22px;
   font-weight: 700;
 }
@@ -227,22 +317,40 @@ button {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px; 
+  gap: 16px;
 }
 
-/* ============================ Card ============================ */
+/* cards */
 
 .card {
-  background: var(--bg-elev);
-  border-radius: var(--radius-md);
+  --bs-card-bg: var(--bg-elev);
+  --bs-card-color: var(--text-primary);
+  --bs-card-border-width: 0;
+  --bs-card-border-radius: var(--radius-md);
+
   padding: 14px;
-  transition: background 0.18s ease;
   position: relative;
   cursor: pointer;
+  transition:
+    background var(--t-base),
+    transform var(--t-base) var(--ease),
+    box-shadow var(--t-base);
+  /* modificato: "backwards" al posto di "both", altrimenti il transform finale dell'animazione blocca lo scale in hover */
+  animation: fade-in var(--t-slow) var(--ease) backwards;
 }
+
 .card:hover {
   background: var(--bg-elev-hover);
+
+  transform: scale(1.03);
+  box-shadow: var(--shadow);
+  z-index: 2;
 }
+
+.card:active {
+  transform: scale(0.99);
+}
+
 .card-image-wrap {
   position: relative;
   width: 100%;
@@ -252,30 +360,37 @@ button {
   margin-bottom: 12px;
   background: #000;
 }
-.card-image-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+
 .card-image-wrap.round {
   border-radius: 50%;
 }
+
+.card-image-wrap img {
+  transition: transform 0.5s var(--ease);
+}
+
+.card:hover .card-image-wrap img {
+  transform: scale(1.05);
+}
+
 .card-title {
   font-weight: 700;
   font-size: 14px;
-  margin: 0 0 4px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin: 0 0 4px;
 }
+
 .card-sub {
   color: var(--text-secondary);
   font-size: 12px;
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.card-play,
+.card-fav {
+  display: grid;
+  place-items: center;
+  border: none;
+  opacity: 0;
 }
 
 .card-play {
@@ -287,18 +402,25 @@ button {
   border-radius: 50%;
   background: var(--success);
   color: #000;
-  border: none;
   font-size: 20px;
-  display: grid;
-  place-items: center;
   box-shadow: var(--shadow);
-  opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity var(--t-base),
+    transform var(--t-base) var(--ease);
 }
+
 .card:hover .card-play {
   opacity: 1;
   transform: translateY(0);
+}
+
+.card-play:hover {
+  transform: scale(1.1) !important;
+}
+
+.card-play:active {
+  transform: scale(0.95) !important;
 }
 
 .card-fav {
@@ -310,30 +432,37 @@ button {
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
-  border: none;
   font-size: 16px;
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transition: opacity 0.2s;
+  transition:
+    opacity var(--t-base),
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast);
 }
+
 .card:hover .card-fav,
 .card-fav.is-fav {
   opacity: 1;
 }
-.card-fav.is-fav {
-  color: var(--danger);
+
+.card-fav:hover {
+  transform: scale(1.15);
 }
 
-/* ============================ Hero album / artista ============================ */
+.card-fav.is-fav {
+  color: var(--danger);
+  animation: heart-animation 0.35s var(--ease);
+}
+
+/*album hero ----> DA VEDERE COME VA A SCHERMO*/
 
 .album-hero,
 .artist-hero {
   display: flex;
   gap: 24px;
   align-items: flex-end;
-  padding: 24px 0 16px 0;
+  padding: 24px 0 16px;
 }
+
 .album-cover {
   width: 220px;
   height: 220px;
@@ -343,30 +472,41 @@ button {
   box-shadow: var(--shadow);
   flex-shrink: 0;
 }
+
+.album-cover.round {
+  border-radius: 50%;
+  /* per fare lacover tonda nella pagina artista */
+}
+
 .album-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
+
 .hero-meta {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
 }
+
 .hero-kicker {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
+  margin: 0;
 }
+
 .hero-title {
   font-size: clamp(32px, 6vw, 72px);
   font-weight: 900;
   margin: 0;
   line-height: 1.05;
 }
+
 .hero-sub {
   color: var(--text-secondary);
   font-size: 14px;
@@ -374,11 +514,19 @@ button {
 }
 
 .hero-actions {
+  padding: 16px 0 24px;
+}
+
+.hero-actions {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 0 24px 0;
 }
+
+.artist-hero .album-cover {
+  border-radius: 50%;
+}
+
 .btn-play-big {
   width: 56px;
   height: 56px;
@@ -387,7 +535,20 @@ button {
   color: #000;
   border: none;
   font-size: 24px;
+  transition:
+    transform var(--t-base) var(--ease),
+    background var(--t-base);
 }
+
+.btn-play-big:hover {
+  transform: scale(1.08);
+  background: #3be477;
+}
+
+.btn-play-big:active {
+  transform: scale(0.96);
+}
+
 .btn-fav-big {
   width: 36px;
   height: 36px;
@@ -396,17 +557,30 @@ button {
   border: 1px solid var(--text-secondary);
   color: var(--text-secondary);
   font-size: 18px;
+  transition:
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast),
+    border-color var(--t-fast);
 }
+
+.btn-fav-big:hover {
+  transform: scale(1.1);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
 .btn-fav-big.is-fav {
   color: var(--danger);
   border-color: var(--danger);
+  animation: heart-animation 0.35s var(--ease);
 }
 
-/* ============================ Tracklist ============================ */
+/* tracklist */
 
 .tracklist {
   margin-top: 8px;
 }
+
 .track-row {
   display: grid;
   grid-template-columns: 32px 1fr 80px 48px;
@@ -415,44 +589,76 @@ button {
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast);
 }
+
 .track-row:hover {
   background: var(--bg-elev);
 }
+
 .track-row.is-playing {
   color: var(--success);
 }
+
 .track-num {
   color: var(--text-secondary);
   text-align: center;
 }
-.track-title {
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
 .track-time {
   color: var(--text-secondary);
   text-align: right;
 }
+
+.track-num,
+.track-time {
+  margin: 0;
+}
+
+.track-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-tracks h2 {
+  margin: 16px 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .track-fav {
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-size: 16px;
+  transition:
+    transform var(--t-fast) var(--ease),
+    color var(--t-fast);
 }
+
+.track-fav:hover {
+  transform: scale(1.2);
+  color: var(--text-primary);
+}
+
 .track-fav.is-fav {
   color: var(--danger);
+  animation: heart-animation 0.35s var(--ease);
 }
 
-/* ============================ Search ============================ */
+/*ricerca*/
 
 .search-box {
-  margin-top: 8px;
-  margin-bottom: 16px;
+  margin-block: 8px 16px;
 }
+
 .search-input {
   width: 100%;
   max-width: 480px;
@@ -462,23 +668,22 @@ button {
   background: var(--bg-input);
   color: var(--text-input);
   font-size: 14px;
-  outline: none;
+  transition: box-shadow var(--t-base);
 }
 
-/* ============================ Player ============================ */
-
-.player {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  align-items: center;
-  gap: 16px;
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(247, 216, 0, 0.45);
 }
+
+/* player */
+
 .player-track {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
 }
+
 .player-cover {
   width: 56px;
   height: 56px;
@@ -487,29 +692,27 @@ button {
   overflow: hidden;
   flex-shrink: 0;
 }
+
 .player-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
+
 .player-meta {
   min-width: 0;
 }
+
 .player-title {
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   margin: 0;
 }
+
 .player-artist {
   font-size: 11px;
   color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   margin: 0;
 }
 
@@ -519,20 +722,32 @@ button {
   align-items: center;
   gap: 6px;
 }
+
 .player-controls {
   display: flex;
   align-items: center;
   gap: 16px;
 }
+
 .btn-ctrl {
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-size: 16px;
+  transition:
+    color var(--t-fast),
+    transform var(--t-fast) var(--ease);
 }
+
 .btn-ctrl:hover {
   color: var(--text-primary);
+  transform: scale(1.18);
 }
+
+.btn-ctrl:active {
+  transform: scale(0.92);
+}
+
 .btn-play {
   width: 36px;
   height: 36px;
@@ -541,6 +756,18 @@ button {
   color: #000;
   border: none;
   font-size: 14px;
+  transition:
+    transform var(--t-fast) var(--ease),
+    background var(--t-fast);
+}
+
+.btn-play:hover {
+  transform: scale(1.1);
+  background: #e6e6e6;
+}
+
+.btn-play:active {
+  transform: scale(0.95);
 }
 
 .player-progress {
@@ -552,25 +779,31 @@ button {
   font-size: 11px;
   color: var(--text-secondary);
 }
+
 .progress-bar,
 .volume-bar {
+  display: block;
   flex: 1;
   height: 4px;
-  background: #4d4d4d;
+  background: var(--track-bar);
   border-radius: 2px;
   overflow: hidden;
   cursor: pointer;
   position: relative;
 }
+
 .progress-fill,
 .volume-fill {
   height: 100%;
   width: 0%;
   background: var(--text-primary);
   border-radius: 2px;
-  pointer-events: none; /* rileva il click sulla barra principale */
-  transition: width 0.2s ease;
+  pointer-events: none;
+  transition:
+    width 0.2s ease,
+    background var(--t-fast);
 }
+
 .progress-bar:hover .progress-fill,
 .volume-bar:hover .volume-fill {
   background: var(--success);
@@ -582,47 +815,60 @@ button {
   justify-content: flex-end;
   gap: 10px;
 }
+
 .volume-bar {
+  flex: none;
   width: 120px;
 }
 
-/* ============================ Loading / empty ============================ */
-
-.loader {
-  padding: 32px;
-  text-align: center;
-  color: var(--text-secondary);
-}
+.loader,
 .empty {
   padding: 32px;
   text-align: center;
   color: var(--text-secondary);
 }
 
-/* ============================ Responsive ============================ */
+.active {
+  color: var(--success);
+}
+
+.repeat-one {
+  color: white;
+  font-weight: bold;
+}
+
+/* responsive*/
 
 @media (max-width: 800px) {
   .app {
     grid-template-columns: 80px 1fr;
   }
+
   .brand-text,
   .sidebar-section-title,
   .sidebar-list,
   .sidebar-nav a span:not(.ico) {
     display: none;
   }
+
   .sidebar-nav a {
     justify-content: center;
     padding: 10px 0;
   }
+
   .album-hero,
   .artist-hero {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .album-cover {
     width: 160px;
     height: 160px;
+  }
+
+  .sidebar-list {
+    display: none !important;
   }
 }
 
@@ -630,17 +876,43 @@ button {
   .app {
     grid-template-columns: 0 1fr;
   }
+
   .sidebar {
     display: none;
   }
+
   .player {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
+
   .player-right {
     display: none;
   }
+
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+    .topbar-search {
+    display: block;
+    flex: 1;
+    margin-right: 16px;
+  }
+
+   .search-box {
+    display: none;
+  }
+  
+}
+
+/*accessibilità*/
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
